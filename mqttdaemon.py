@@ -197,15 +197,17 @@ def on_connect(client, userdata, flags, rc):
         lwt_topic="tele/"+device['mqtt_topic']+"/LWT"     # Online/Offline topic name
         cmd_topic="cmnd/"+device['mqtt_topic']+"/POWER"   # Command topic name
         state_topic="stat/"+device['mqtt_topic']+"/POWER" # State topic name
-        mqtt_publish(client, lwt_topic, lwt_online, True, device)
         # Initializing relays - updating their current status
         logging.info("[Board="+device['mqtt_topic']+"] INFO Initializing relays and updating their current states")
         relayinit(device)
-        # Purging previously retained MQTT discovery messages
-        purge_discovery(client, device)
-        # Sending MQTT discovery messages if enabled
+        # Publising availability
+        logging.info("[Board="+device['mqtt_topic']+"] INFO Publishing device availability ["+lwt_topic+"]="+lwt_online)
+        mqtt_publish(client, lwt_topic, lwt_online, True, device)
         if mqtt_discovery:
+            # Sending MQTT discovery messages if enabled
             send_discovery(client, device)
+            # Purging previously retained MQTT discovery messages
+            purge_discovery(client, device)
         # Subscribing to the necessary amount of command topics
         for i in range(0, device['relays_count']+1):
             topic=cmd_topic+("" if i==0 else str(i))

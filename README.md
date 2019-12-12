@@ -32,6 +32,56 @@ Once the daemon is loaded, you can check its log file:
 You can use any MQTT client. With the Mosquitto client ([mosquitto_pub](https://manpages.debian.org/testing/mosquitto-clients/mosquitto_pub.1.en.html)) you can test turning a relay on, using the command line:
 `mosquitto_pub -h 127.0.0.1 -u {Your_username} -P {Your_password} -t cmnd/{your_board_mqtt_topic}/POWER6 -m "ON"`
 
+## Configuration for HomeAssistant
+If you want to use [HomeAssistant](https://www.home-assistant.io/), you have two options:
+- Configure the switches manually setting `mqtt_discovery` to `False` on `config.py`:
+```
+# Example HomeAssistant configuration.yaml entry
+switch:
+  - platform: mqtt
+    name: kmtronic_board1_relay5
+    state_topic: "stat/kmtronic1/POWER5"
+    command_topic: "cmnd/kmtronic1/POWER5"
+    availability_topic: "tele/kmtronic1/LWT"
+    qos: 1
+    payload_on: "ON"
+    payload_off: "OFF"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    retain: true
+  - platform: mqtt
+    name: kmtronic_board1_relay6
+    state_topic: "stat/kmtronic1/POWER6"
+    command_topic: "cmnd/kmtronic1/POWER6"
+    availability_topic: "tele/kmtronic1/LWT"
+    qos: 1
+    payload_on: "ON"
+    payload_off: "OFF"
+    payload_available: "Online"
+    payload_not_available: "Offline"
+    retain: true
+# And so on...
+
+mqtt:
+  broker: 127.0.0.1
+  port: 1883
+  client_id: home-assistant-1
+  username: Your_username
+  password: Your_password
+```    
+- Or use the auto-discovery to let homeassistant configure the relays setting `mqtt_discovery` to `False` on `config.py`
+```
+# Example HomeAssistant configuration.yaml entry
+mqtt:
+  broker: 127.0.0.1
+  port: 1883
+  client_id: home-assistant-1
+  username: Your_username
+  password: Your_password
+  discovery: true
+  discovery_prefix: homeassistant
+```
+
 ## Requirements
 - Python3
 - A MQTT server installed (ie. [Mosquitto](https://mosquitto.org/))
