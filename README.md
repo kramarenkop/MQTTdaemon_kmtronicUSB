@@ -34,7 +34,8 @@ You can use any MQTT client. With the Mosquitto client ([mosquitto_pub](https://
 
 ## Configuration for HomeAssistant
 If you want to use [HomeAssistant](https://www.home-assistant.io/), you have two options:
-- Configure the switches manually setting `mqtt_discovery` to `False` on `config.py`:
+- Configure the switches manually setting `mqtt_discovery` to `False` on `config.py`.
+  Use the example below as reference to configure HomeAssistant:
 ```
 # Example HomeAssistant configuration.yaml entry
 switch:
@@ -69,7 +70,7 @@ mqtt:
   username: Your_username
   password: Your_password
 ```    
-- Or use the auto-discovery to let homeassistant configure the relays setting `mqtt_discovery` to `False` on `config.py`
+- Or use the auto-discovery to let homeassistant configure the relays setting `mqtt_discovery` to `True` on `config.py`
 ```
 # Example HomeAssistant configuration.yaml entry
 mqtt:
