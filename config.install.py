@@ -9,6 +9,8 @@ mqtt_host="127.0.0.1"
 mqtt_port=1883
 mqtt_username="Your-user"
 mqtt_password="Your-password"
+# Retain status on MQTT server. This flag tells the broker to store the last message that you sent.
+mqtt_retain=True
 logfile="/var/log/mqttdaemon.log"
 pidfile='/tmp/mqttdaemon.pid'
 # You can add multiple Kmtronic USB relay boards to this array

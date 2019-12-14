@@ -115,7 +115,7 @@ def relayinit(device):
             this_payload = cmd_on
         else:
             this_payload = cmd_off
-        mqtt_publish(client, statetopic, this_payload, True, device)
+        mqtt_publish(client, statetopic, this_payload, mqtt_retain, device)
         time.sleep(0.15)
     logging.info("[Board="+device['mqtt_topic']+"] INFO MQTT status updated for relay " + ser.portstr)
 # Relay on
@@ -153,7 +153,7 @@ def mqtt_publish(client, topic, payload, retain, device):
 def purge_discovery(client, device):
     for i in range(1, device['relays_count']+1):
         topic=mqtt_discovery_prefix+"/switch/"+device['mqtt_topic']+"_"+str(i)+"/config"
-        mqtt_publish(client, topic, "", True, device)
+        mqtt_publish(client, topic, "", mqtt_retain, device)
 # Sends MQTT discovery messages
 def send_discovery(client, device):
     for i in range(1, device['relays_count']+1):
@@ -188,7 +188,7 @@ def on_disconnect(client, userdata, rc):
     logging.info("[Main process] MQTT - Disconnected")
     for device in devices.values():
         lwt_topic="tele/"+device['mqtt_topic']+"/LWT"     # Online/Offline topic name
-        mqtt_publish(client, lwt_topic, lwt_offline, True, device)
+        mqtt_publish(client, lwt_topic, lwt_offline, mqtt_retain, device)
     print("")
 def on_connect(client, userdata, flags, rc):
     logging.info("[Main process] MQTT - Connected: result code "+str(rc))
@@ -202,7 +202,7 @@ def on_connect(client, userdata, flags, rc):
         relayinit(device)
         # Publising availability
         logging.info("[Board="+device['mqtt_topic']+"] INFO Publishing device availability ["+lwt_topic+"]="+lwt_online)
-        mqtt_publish(client, lwt_topic, lwt_online, True, device)
+        mqtt_publish(client, lwt_topic, lwt_online, mqtt_retain, device)
         if mqtt_discovery:
             # Sending MQTT discovery messages if enabled
             send_discovery(client, device)
@@ -243,7 +243,7 @@ def on_message(client, userdata, msg):
                 off(i, device)
             if cmd_toggle in message:
                 toggle(i, device)
-            mqtt_publish(client, statetopic, state(i, device), True, device)
+            mqtt_publish(client, statetopic, state(i, device), mqtt_retain, device)
 
 def start_process():
     global client

@@ -3,7 +3,7 @@ This Python daemon creates a link between a MQTT server and KMtronic USB/serial 
 So you can easily control these relays remotely and integrate them in [HomeAssistant](https://www.home-assistant.io/) or any other home automation system.
 
 ## Some features
-- It reads current relay states on init and updates the MQTT server accordingly.
+- It reads current relay states on init and updates the MQTT server accordingly. So if the MQTT server didn't keep a previous state, the relays will be set to their current actual state. If the MQTT had retained states, they will be updated after reading.
 - It controls one or multiple USB relay-boards listening MQTT commands
 - Execution available in daemon or normal mode
   `python mqttdaemon.py start` or `python mqttdaemon.py start-nodaemon`
