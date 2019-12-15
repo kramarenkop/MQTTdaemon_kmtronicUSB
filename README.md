@@ -1,13 +1,15 @@
 # MQTTdaemon for KMTronic USB relay boards
 This Python daemon creates a link between a MQTT server and KMtronic USB/serial RS232 relay boards.
 So you can easily control these relays remotely and integrate them in [HomeAssistant](https://www.home-assistant.io/) or any other home automation system.
+<div align="center">
+        <img width="20%" src="https://www.kmtronic.com/image/cache/catalog/product_343-500x500.jpg"/>
+</div>
 
 ## Some features
-- It reads current relay states on init and updates the MQTT server accordingly. So if the MQTT server didn't keep a previous state, the relays will be set to their current actual state. If the MQTT had retained states, they will be updated after reading.
 - It controls one or multiple USB relay-boards listening MQTT commands
 - Execution available in daemon or normal mode
   `python mqttdaemon.py start` or `python mqttdaemon.py start-nodaemon`
-- **HomeAssistant MQTT Discovery** - The daemon can automatically add the relays as switches in HomeAssistant if you set the option `mqtt_discovery` to `True` in `config.py` file. Keep this setting to `False` if you prefer to create HomeAssistant entities manually.
+- **HomeAssistant MQTT Discovery** - The daemon can automatically add the relays as switches in HomeAssistant if you set the option `mqtt_discovery` to `True` in `config.py` file. Keep this setting to `False` if you prefer to create HomeAssistant entities manually (see below).
 
 ## MQTT commands
 | MQTT command | Description |
@@ -75,7 +77,7 @@ mqtt:
   username: Your_username
   password: Your_password
 ```    
-- Or use the auto-discovery to let homeassistant configure the relays setting `mqtt_discovery` to `True` on `config.py`
+- Or use the auto-discovery to let homeassistant configures the relays, setting `mqtt_discovery` to `True` on `config.py`
 ```
 # Example HomeAssistant configuration.yaml entry
 mqtt:
