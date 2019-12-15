@@ -12,9 +12,9 @@ So you can easily control these relays remotely and integrate them in [HomeAssis
 ## MQTT commands
 | MQTT command | Description |
 | ------------- | ------------- |
-| cmd/{BOARDTOPIC}/POWER{relay}  | turn (ON/OFF/TOGGLE)  |
-| stat/{BOARDTOPIC}/POWER{relay}  | returns the state of the relay (ON/OFF)  |
-| tele/{BOARDTOPIC}/LWT  | returns the state of the board (Online/Offline)  |
+| `cmd/{BOARDTOPIC}/POWER{relay}`  | turn (ON/OFF/TOGGLE)  |
+| `stat/{BOARDTOPIC}/POWER{relay}`  | returns the state of the relay (ON/OFF)  |
+| `tele/{BOARDTOPIC}/LWT`  | returns the state of the board (Online/Offline)  |
 
 ## Installation
 1. Download and unzip or clone project
@@ -25,12 +25,17 @@ So you can easily control these relays remotely and integrate them in [HomeAssis
 5. Execute the daemon
    `python mqttdaemon.py start`
 
-## Test the relays
-Once the daemon is loaded, you can check its log file:
-`tail -f /var/log/mqttdaemon.log`
+## Configuration
+The [configuration file](https://github.com/migrivas/MQTTdaemon_kmtronicUSB/blob/master/config.install.py) is pretty straightforward.
+Rename it to config.py, and edit it as needed.
 
-You can use any MQTT client. With the Mosquitto client ([mosquitto_pub](https://manpages.debian.org/testing/mosquitto-clients/mosquitto_pub.1.en.html)) you can test turning a relay on, using the command line:
-`mosquitto_pub -h 127.0.0.1 -u {Your_username} -P {Your_password} -t cmnd/{your_board_mqtt_topic}/POWER6 -m "ON"`
+## Daemon options
+| Command | Description |
+| ------------- | ------------- |
+| `python mqttdaemon.py start`  | Start daemon  |
+| `python mqttdaemon.py start-nodaemon`  | Run in the same console, without daemon  |
+| `python mqttdaemon.py restart`  | Restart  |
+| `python mqttdaemon.py stop`  | Stop  |
 
 ## Configuration for HomeAssistant
 If you want to use [HomeAssistant](https://www.home-assistant.io/), you have two options:
@@ -83,6 +88,13 @@ mqtt:
   discovery_prefix: homeassistant
 ```
 
+## Test the relays
+Once the daemon is loaded, you can check its log file:
+`tail -f /var/log/mqttdaemon.log`
+
+You can use any MQTT client. With the Mosquitto client ([mosquitto_pub](https://manpages.debian.org/testing/mosquitto-clients/mosquitto_pub.1.en.html)) you can test turning a relay on, using the command line:
+`mosquitto_pub -h 127.0.0.1 -u {Your_username} -P {Your_password} -t cmnd/{your_board_mqtt_topic}/POWER6 -m "ON"`
+
 ## Requirements
 - Python3
 - A MQTT server installed (ie. [Mosquitto](https://mosquitto.org/))
@@ -94,5 +106,5 @@ Tested with:
 - Hardware: [KMTronic 8-Channel USB relay boards](https://sigma-shop.com/product/8/-usb-eight-channel-relay-controller-serial-controlled-12v-ftdi-.html) (with /dev/ttyUSB* and /dev/ttyACM* ports)
 
 ## Credits
-- This project is based on an original work from [donatmarko](https://github.com/donatmarko/kmtronic-usb-relaybox-mqtt). I've added some additional features (daemon mode, support for multiple boards, reading states on init...).
-- It uses [Paho MQTT](https://pypi.org/project/paho-mqtt/) and [Pyserial](https://github.com/pyserial/pyserial) libraries
+- This project is based on an original work from [donatmarko](https://github.com/donatmarko/kmtronic-usb-relaybox-mqtt). I've added some additional features (daemon mode, support for multiple boards, reading states on init, logging...).
+- Libraries: [Paho MQTT](https://pypi.org/project/paho-mqtt/) and [Pyserial](https://github.com/pyserial/pyserial)

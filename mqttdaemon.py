@@ -31,6 +31,7 @@ logging.basicConfig(
 
 # Array that stores the relays' statuses
 relaystates={}              # will be auto set per each device later
+tmpstatus={}                # will be auto set per each device later
 state_topic=""              # will be auto set per each device later
 lwt_online="Online"         # Online message
 lwt_offline="Offline"       # Offline message
@@ -38,6 +39,7 @@ cmd_on="ON"                 # "On" command
 cmd_off="OFF"               # "Off" command
 cmd_toggle="TOGGLE"         # "Toggle" command
 client = None
+already_init_device=[]
 
 # Gets an ID from MAC address to idenfity the client on MQTT server
 def get_uuid():
@@ -65,10 +67,12 @@ def serialconnect(device):
     return ser
 # We set the relays with its current status returned from the board.
 def relayinit(device):
+    global tmpstatus
+    global relaystates
     ser=serialconnect(device)
     this_device = device['mqtt_topic']
     relaystates[this_device]=[False, False, False, False, False, False, False, False]
-    tmpstatus = [0,0,0,0,0,0,0,0]
+    tmpstatus[this_device]=[0, 0, 0, 0, 0, 0, 0, 0]
     logging.info("[Board="+device['mqtt_topic']+"] INFO Requesting status of "+str(device['relays_count'])+" relays on USB board " + ser.portstr)
     ser.write(serial.to_bytes([0xFF,0x09,0x00]))
     logging.info("[Board="+device['mqtt_topic']+"] INFO Reading current status from " + ser.portstr)
@@ -91,10 +95,10 @@ def relayinit(device):
         tmplog = tmplog + " " + str(count) + "=>" + tmp
         if tmp == "1":
             relaystates[this_device][count] = True
-            tmpstatus[count] = 1
+            tmpstatus[this_device][count] = 1
         elif tmp == "0":
             relaystates[this_device][count] = False
-            tmpstatus[count] = 0
+            tmpstatus[this_device][count] = 0
         time.sleep(0.05)
         count = count + 1
     # Setting the relay states
@@ -102,22 +106,24 @@ def relayinit(device):
         logging.info("[Board="+device['mqtt_topic']+"] WARNING could not read from "+ ser.portstr+", retrying")
         relayinit(device)
     logging.info("[Board="+device['mqtt_topic']+"] INFO "+ ser.portstr + " returned:"+tmplog)
+# This will publish the previously got states from the board
+def set_initial_board_state(device):
+    this_device = device['mqtt_topic']
     logging.info("[Board="+device['mqtt_topic']+"] INFO Updating initial status of "+str(device['relays_count'])+" relays on MQTT server")
     state_topic="stat/"+device['mqtt_topic']+"/POWER" # State topic name
     for i in range(0, device['relays_count']+1):
         statetopic=state_topic+("" if i==0 else str(i))
         if i==0:
             i=1
-            to_set=tmpstatus[0]
+            to_set=tmpstatus[this_device][0]
         else:
-            to_set=tmpstatus[i-1]
+            to_set=tmpstatus[this_device][i-1]
         if to_set == 1:
             this_payload = cmd_on
         else:
             this_payload = cmd_off
-        mqtt_publish(client, statetopic, this_payload, mqtt_retain, device)
+        mqtt_publish(client, statetopic, this_payload, False, device)
         time.sleep(0.15)
-    logging.info("[Board="+device['mqtt_topic']+"] INFO MQTT status updated for relay " + ser.portstr)
 # Relay on
 def on(relay, device):
     logging.info("[Board="+device['mqtt_topic']+"] INFO Setting relay to "+str(relay)+" ON")
@@ -214,7 +220,16 @@ def on_connect(client, userdata, flags, rc):
             client.subscribe(topic)
             logging.info("[Board="+device['mqtt_topic']+"] INFO Subscribed to "+topic)
         client.will_set(lwt_topic, lwt_offline, 1, True)
-
+def on_subscribe(client, userdata, mid, granted_qos):
+    global already_init_device
+    if mqtt_update_from_board:
+        for device in devices.values():
+            if (device['mqtt_topic'] not in already_init_device):
+                already_init_device.append(device['mqtt_topic'])
+                time.sleep(4)
+                logging.info("[Main process] MQTT - Received initial subscription")
+                logging.info("[Board="+device['mqtt_topic']+"] INFO Overwritting retained MQTT initial states with the actual states of board")
+                set_initial_board_state(device)
 def on_message(client, userdata, msg):
     message=msg.payload.decode().upper()
     logging.info("[Main process] New message ["+msg.topic+"] = "+message)
@@ -254,6 +269,7 @@ def start_process():
     client = mqtt.Client(client_id="kmtronic-"+get_uuid())
     client.on_connect=on_connect
     client.on_message=on_message
+    client.on_subscribe=on_subscribe
     client.on_disconnect=on_disconnect
     client.username_pw_set(mqtt_username, mqtt_password)
     try:
@@ -269,7 +285,7 @@ class MyDaemon(daemon):
         logging.info('Daemon Started')
         start_process()
         while True:
-            logging.info(time.strftime("%I:%M:%S %p"))
+            #logging.info(time.strftime("%I:%M:%S %p"))
             time.sleep(2)
         logging.info('Daemon Ended')
 
