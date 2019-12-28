@@ -98,7 +98,7 @@ You can use any MQTT client. With the Mosquitto client ([mosquitto_pub](https://
 `mosquitto_pub -h 127.0.0.1 -u {Your_username} -P {Your_password} -t cmnd/{your_board_mqtt_topic}/POWER6 -m "ON"`
 
 ## Requirements
-- Python3
+- Python 3 (Python 2.7 might work)
 - A MQTT server installed (ie. [Mosquitto](https://mosquitto.org/))
 - One (or multiple) KMtronic USB/Serial board connected to the machine running the daemon.
 

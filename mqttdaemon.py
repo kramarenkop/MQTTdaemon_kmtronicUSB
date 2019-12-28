@@ -2,7 +2,7 @@ __author__ = "Miguel Rivas"
 __copyright__ = "2019 Miguel Rivas"
 __credits__ = ["Miguel Rivas"]
 __license__ = "GPL-3.0"
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 # MQTTdaemon for KMTronic USB-serial relay boards
 # https://github.com/migrivas/MQTTdaemon_kmtronicUSB
@@ -22,9 +22,7 @@ import paho.mqtt.client as mqtt
 # Logging
 logging.basicConfig(
     filename=logfile,
-	filemode='a',
-    maxBytes=5242880,
-    backupCount=2,
+	filemode='w',
 	format='[%(asctime)s] %(message)s',
 	datefmt='%Y-%d-%m %H:%M:%S',
 	level=logging.INFO)
@@ -302,7 +300,7 @@ if __name__ == "__main__":
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:
             daemonx.start()
-            print ""
+            print ("")
         if 'start-nodaemon' == sys.argv[1]:
             consoleDisplay = logging.StreamHandler()
             logFormatter = logging.Formatter("%(asctime)s %(message)s","%Y-%m-%d %H:%M:%S")
@@ -316,15 +314,15 @@ if __name__ == "__main__":
             logging.getLogger().addHandler(consoleDisplay)
             daemonx.stop()
             logging.info('Daemon Stopped')
-            print ""
+            print ("")
         elif 'restart' == sys.argv[1]:
             print("Restarting process...")
             logging.info('Daemon restarting')
             daemonx.restart()
-            print ""
+            print ("")
         else:
             print("Unknown command")
-            print ""
+            print ("")
             sys.exit(2)
         sys.exit(0)
     else:

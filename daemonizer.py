@@ -2,7 +2,7 @@ __author__ = "Miguel Rivas"
 __copyright__ = "2019 Miguel Rivas"
 __credits__ = ["Miguel Rivas"]
 __license__ = "GPL-3.0"
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 # MQTTdaemon for KMTronic USB-serial relay boards
 # https://github.com/migrivas/MQTTdaemon_kmtronicUSB
